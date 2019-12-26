@@ -41,8 +41,18 @@ namespace CoreApp1.Areas.Identity.Pages.Account.Manage
         public class InputModel
         {
             [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Nick")]
+            public string Nick { get; set; }
+
+            [Required]
             [EmailAddress]
             public string Email { get; set; }
+
+            [Required]
+            [Display(Name = "Birth Date")]
+            [DataType(DataType.Date)]
+            public DateTime DOB { get; set; }
 
             [Phone]
             [Display(Name = "Phone number")]
@@ -65,7 +75,9 @@ namespace CoreApp1.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                Nick = Username,
                 Email = email,
+                DOB = user.DOB,
                 PhoneNumber = phoneNumber
             };
 
@@ -108,6 +120,29 @@ namespace CoreApp1.Areas.Identity.Pages.Account.Manage
                     throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
                 }
             }
+
+            if (Input.Nick != Username)
+            {
+                var IsTaken = await _userManager.FindByNameAsync(Input.Nick);
+                if (IsTaken != null)
+                {
+                    StatusMessage = "The nick is already taken";
+                    return RedirectToPage();
+                }
+                var setUsernameResult = await _userManager.SetUserNameAsync(user, Input.Nick);
+                if (!setUsernameResult.Succeeded)
+                {
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    throw new InvalidOperationException($"Unexpected error occurred setting Nick/Username for user with ID '{userId}'.");
+                }
+            }
+
+            if (Input.DOB != user.DOB)
+            {
+                user.DOB = Input.DOB;
+            }
+
+            await _userManager.UpdateAsync(user);
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CoreApp1.Areas.Identity.Data;
@@ -18,7 +19,7 @@ namespace CoreApp1
     public class Startup
     {
         //a list of Uploaded files
-        public static List<FileUploadModel> fileUploadModels = new List<FileUploadModel>();
+        public static List<FileUploadModel> fileUploadModels = GetFiles();
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -68,6 +69,30 @@ namespace CoreApp1
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private static List<FileUploadModel> GetFiles()
+        {
+            List<FileUploadModel> files = new List<FileUploadModel>();
+
+            string[] filesInDir = Directory.GetFiles("FileStorage");
+
+            if(filesInDir.Length > 0)
+            {
+                foreach (string file in filesInDir)
+                {
+                    FileUploadModel fileUpload = new FileUploadModel()
+                    {
+                        Id = Guid.NewGuid(),
+                        Author = "System",
+                        FileName = file.Split('\\')[1],
+                        Created_At = DateTime.Now,
+                        Downloads = 0
+                    };
+                    files.Add(fileUpload);
+                }
+            }
+            return files;
         }
     }
 }

@@ -1,9 +1,5 @@
 ﻿@model IEnumerable<CoreApp1.Models.FileUploadModel>
 
-@{
-    ViewData["Title"] = "Index";
-}
-
 <h2 style="text-align:center">File Sharing Service</h2>
 
 <table class="table">
@@ -25,7 +21,8 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model)
+        {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Author)
@@ -40,21 +37,23 @@
                 @Html.DisplayFor(modelItem => item.Downloads)
             </td>
             <td>
+                @Html.ActionLink("Delete", "Delete", new { fileName = item.FileName })
+            </td>
+            <td>
                 @Html.ActionLink("Download", "Download", new { fileName = item.FileName })
             </td>
         </tr>
-}
+        }
     </tbody>
 </table>
 @if (Model.Count() == 0)
 {
-    <p>No Files To Show</p>
+    <p style="text-align:center">No Files To Show</p>
 }
 
 <form method="post" enctype="multipart/form-data" asp-controller="FileUpload" asp-action="Index">
     <div class="form-group">
         <div class="col-md-10">
-            <p>Upload one or more files using this form:</p>
             <input type="file" name="files" multiple />
         </div>
     </div>
@@ -64,3 +63,5 @@
         </div>
     </div>
 </form>
+
+

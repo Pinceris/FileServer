@@ -73,5 +73,18 @@ namespace CoreApp1.Controllers
             memory.Position = 0;
             return File(memory, MimeTypesMap.GetMimeType(filename), Path.GetFileName(path));
         }
+        //Delete Action
+        public IActionResult Delete(string filename)
+        {
+            if (filename == null)
+                return Content("filename not present");
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), StoragePath, filename);
+
+            Services services = new Services();
+            services.DeleteFile(path);
+
+            return RedirectToAction("Index");
+        }
     }
 }
