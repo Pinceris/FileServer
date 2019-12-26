@@ -7,9 +7,11 @@ using CoreApp1.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using HeyRed.Mime;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreApp1.Controllers
 {
+    [Authorize]
     public class FileUploadController : Controller
     {
         //folder where uploads are kept
@@ -47,9 +49,6 @@ namespace CoreApp1.Controllers
                     }
                 }
             }
-
-            // process uploaded files
-            // Don't rely on or trust the FileName property without validation.
 
             return RedirectToAction("Index");
         }
