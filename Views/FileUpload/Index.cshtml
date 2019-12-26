@@ -10,6 +10,9 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.Author)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.FileName)
             </th>
             <th>
@@ -25,6 +28,9 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.Author)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.FileName)
             </td>
             <td>
@@ -34,7 +40,7 @@
                 @Html.DisplayFor(modelItem => item.Downloads)
             </td>
             <td>
-                @Html.ActionLink("Download", "Download", new { fileName=item.FileName })
+                @Html.ActionLink("Download", "Download", new { fileName = item.FileName })
             </td>
         </tr>
 }

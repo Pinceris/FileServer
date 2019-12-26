@@ -37,6 +37,7 @@ namespace CoreApp1.Controllers
                     FileUploadModel fileUploadModel = new FileUploadModel()
                     {
                         Id = Guid.NewGuid(),
+                        Author = ControllerContext.HttpContext.User.Identity.Name,
                         FileName = formFile.FileName,
                         Created_At = DateTime.Now,
                         Downloads = 0

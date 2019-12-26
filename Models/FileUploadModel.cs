@@ -9,6 +9,7 @@ namespace CoreApp1.Models
     public class FileUploadModel
     {
         public Guid Id { get; set; }
+        public string Author { get; set; }
         [DisplayName("File")]
         public string FileName { get; set; }
         [DisplayName("Upload Date")]
