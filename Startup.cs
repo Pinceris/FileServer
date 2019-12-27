@@ -70,14 +70,13 @@ namespace CoreApp1
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
-
         private static List<FileUploadModel> GetFiles()
         {
             List<FileUploadModel> files = new List<FileUploadModel>();
 
             string[] filesInDir = Directory.GetFiles("FileStorage");
 
-            if(filesInDir.Length > 0)
+            if (filesInDir.Length > 0)
             {
                 foreach (string file in filesInDir)
                 {

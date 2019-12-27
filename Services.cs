@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CoreApp1.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,9 +11,43 @@ namespace CoreApp1
 {
     public class Services
     {
-        public void DeleteFile(string path)
+        public void DeleteFile(string filename)
         {
-            File.Delete(path);
+            if (filename != null)
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), Constants.StoragePath, filename);
+
+                File.Delete(path);
+                Startup.fileUploadModels.RemoveAll(f => f.FileName == filename);
+            }      
+        }
+        public void UploadFiles(List<IFormFile> files, string name)
+        {
+            long size = files.Sum(f => f.Length);
+
+            foreach (var formFile in files)
+            {
+                if (formFile.Length > 0)
+                {
+                    // full path to file in temp location
+                    var filePath = Path.Join(Constants.StoragePath, formFile.FileName);
+                    //Save File Info
+                    FileUploadModel fileUploadModel = new FileUploadModel()
+                    {
+                        Id = Guid.NewGuid(),
+                        Author = name,
+                        FileName = formFile.FileName,
+                        Created_At = DateTime.Now,
+                        Downloads = 0
+                    };
+                    Startup.fileUploadModels.Add(fileUploadModel);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        formFile.CopyTo(stream);
+                    }
+                }
+            }
         }
     }
 }

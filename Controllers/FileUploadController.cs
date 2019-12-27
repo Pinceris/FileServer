@@ -8,48 +8,30 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace CoreApp1.Controllers
 {
     [Authorize]
     public class FileUploadController : Controller
     {
-        //folder where uploads are kept
-        private readonly string StoragePath = "FileStorage";
-
+        private readonly Services services;
+        public FileUploadController()
+        {
+            services = new Services();
+        }
         public IActionResult Index()
         {
+            ViewBag.userIP = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
             return View(Startup.fileUploadModels);
         }
         [HttpPost("FileUpload")]
-        public async Task<IActionResult> Index(List<IFormFile> files)
+        public IActionResult Index(List<IFormFile> files)
         {
-            long size = files.Sum(f => f.Length);
+            string name = ControllerContext.HttpContext.User.Identity.Name;
 
-            foreach (var formFile in files)
-            {
-                if (formFile.Length > 0)
-                {
-                    // full path to file in temp location
-                    var filePath = Path.Join(StoragePath, formFile.FileName);
-                    //Save File Info
-                    FileUploadModel fileUploadModel = new FileUploadModel()
-                    {
-                        Id = Guid.NewGuid(),
-                        Author = ControllerContext.HttpContext.User.Identity.Name,
-                        FileName = formFile.FileName,
-                        Created_At = DateTime.Now,
-                        Downloads = 0
-                    };
-                    Startup.fileUploadModels.Add(fileUploadModel);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await formFile.CopyToAsync(stream);
-                    }
-                }
-            }
+            services.UploadFiles(files, name);
 
             return RedirectToAction("Index");
         }
@@ -59,7 +41,7 @@ namespace CoreApp1.Controllers
             if (filename == null)
                 return Content("filename not present");
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), StoragePath, filename);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), Constants.StoragePath, filename);
 
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
@@ -76,13 +58,7 @@ namespace CoreApp1.Controllers
         //Delete Action
         public IActionResult Delete(string filename)
         {
-            if (filename == null)
-                return Content("filename not present");
-
-            var path = Path.Combine(Directory.GetCurrentDirectory(), StoragePath, filename);
-
-            Services services = new Services();
-            services.DeleteFile(path);
+            services.DeleteFile(filename);
 
             return RedirectToAction("Index");
         }
