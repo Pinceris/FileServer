@@ -11,6 +11,12 @@ namespace CoreApp1
 {
     public class Services
     {
+        public struct Constants
+        {
+            public const string AlertString = "<script language = 'javascript' type='text/javascript'>$(document).ready(function () { alert('Please confirm email to Upload Files'); });</script>";
+            //folder where uploads are kept
+            public const string StoragePath = "FileStorage";
+        }
         public void DeleteFile(string filename)
         {
             if (filename != null)

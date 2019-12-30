@@ -24,26 +24,26 @@
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FileName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Created_At)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Downloads)
-            </td>
-            <td>
-                @Html.ActionLink("Delete", "Delete", new { fileName = item.FileName })
-            </td>
-            <td>
-                @Html.ActionLink("Download", "Download", new { fileName = item.FileName })
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FileName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Created_At)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Downloads)
+                </td>
+                <td>
+                    @Html.ActionLink("Delete", "Delete", new { fileName = item.FileName })
+                </td>
+                <td>
+                    @Html.ActionLink("Download", "Download", new { fileName = item.FileName })
+                </td>
+            </tr>
         }
     </tbody>
 </table>
@@ -56,7 +56,7 @@
     <div class="input-group">
         <label class="input-group-btn">
             <span class="btn btn-primary">
-                Browse&hellip; <input type="file" name="files" style="display: none;" multiple>
+                Browse&hellip; <input type="file" name="files" style="display: none;" multiple required>
             </span>
         </label>
         <input type="text" class="form-control" readonly>
@@ -68,31 +68,32 @@
 
 <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"></script>
 <script type="text/javascript">
-    $(function() {
+    $(function () {
 
-  // We can attach the `fileselect` event to all file inputs on the page
-  $(document).on('change', ':file', function() {
-    var input = $(this),
-        numFiles = input.get(0).files ? input.get(0).files.length : 1,
-        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-    input.trigger('fileselect', [numFiles, label]);
-  });
+        // We can attach the `fileselect` event to all file inputs on the page
+        $(document).on('change', ':file', function () {
+            var input = $(this),
+                numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+            input.trigger('fileselect', [numFiles, label]);
+        });
 
-  // We can watch for our custom `fileselect` event like this
-  $(document).ready( function() {
-      $(':file').on('fileselect', function(event, numFiles, label) {
+        // We can watch for our custom `fileselect` event like this
+        $(document).ready(function () {
+            $(':file').on('fileselect', function (event, numFiles, label) {
 
-          var input = $(this).parents('.input-group').find(':text'),
-              log = numFiles > 1 ? numFiles + ' files selected' : label;
+                var input = $(this).parents('.input-group').find(':text'),
+                    log = numFiles > 1 ? numFiles + ' files selected' : label;
 
-          if( input.length ) {
-              input.val(log);
-          } else {
-              if( log ) alert(log);
-          }
+                if (input.length) {
+                    input.val(log);
+                } else {
+                    if (log) alert(log);
+                }
 
-      });
-  });
+            });
+        });
 
-});
+    });
 </script>
+@Html.Raw(TempData["alert"])

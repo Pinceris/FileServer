@@ -9,29 +9,46 @@ using Microsoft.AspNetCore.Mvc;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
+using CoreApp1.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace CoreApp1.Controllers
 {
     [Authorize]
     public class FileUploadController : Controller
     {
-        private readonly Services services;
-        public FileUploadController()
+        private readonly UserManager<CoreApp1User> _userManager;
+        private readonly SignInManager<CoreApp1User> _signInManager;
+        private readonly Services _services;
+        public FileUploadController(
+            UserManager<CoreApp1User> userManager,
+            SignInManager<CoreApp1User> signInManager)
         {
-            services = new Services();
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _services = new Services();
         }
+
         public IActionResult Index()
         {
-            ViewBag.userIP = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            ViewBag.userIP = Request.HttpContext.Connection.LocalIpAddress.ToString();
 
             return View(Startup.fileUploadModels);
         }
         [HttpPost("FileUpload")]
-        public IActionResult Index(List<IFormFile> files)
+        public async Task<IActionResult> IndexAsync(List<IFormFile> files)
         {
+            var user = await _userManager.GetUserAsync(User);
+
+            if(!user.EmailConfirmed)
+            {
+                TempData["alert"] = Services.Constants.AlertString;
+                return RedirectToAction("Index");
+            }
+
             string name = ControllerContext.HttpContext.User.Identity.Name;
 
-            services.UploadFiles(files, name);
+            _services.UploadFiles(files, name);
 
             return RedirectToAction("Index");
         }
@@ -41,7 +58,7 @@ namespace CoreApp1.Controllers
             if (filename == null)
                 return Content("filename not present");
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), Constants.StoragePath, filename);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), Services.Constants.StoragePath, filename);
 
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
@@ -58,7 +75,7 @@ namespace CoreApp1.Controllers
         //Delete Action
         public IActionResult Delete(string filename)
         {
-            services.DeleteFile(filename);
+            _services.DeleteFile(filename);
 
             return RedirectToAction("Index");
         }
