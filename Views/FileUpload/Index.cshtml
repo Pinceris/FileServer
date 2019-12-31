@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<CoreApp1.Models.FileUploadModel>
 
+<link rel="stylesheet" href="~/css/UploadStyles.css" />
+
 <h2 style="text-align:center">File Sharing Service</h2>
 <h6 style="float:right">Your IP address is: @ViewBag.userIP</h6>
 
@@ -61,8 +63,8 @@
         </label>
         <input type="text" class="form-control" readonly>
     </div>
-    <div>
-        <input class="btn btn-success" style="width:100%" type="submit" value="Upload" />
+    <div class="buttonS">
+        <input class="btn btn-success" type="submit" value="Upload" />
     </div>
 </form>
 

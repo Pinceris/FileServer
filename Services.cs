@@ -35,7 +35,7 @@ namespace CoreApp1
             {
                 if (formFile.Length > 0)
                 {
-                    // full path to file in temp location
+                    // full path to file
                     var filePath = Path.Join(Constants.StoragePath, formFile.FileName);
                     //Save File Info
                     FileUploadModel fileUploadModel = new FileUploadModel()
@@ -46,11 +46,21 @@ namespace CoreApp1
                         Created_At = DateTime.Now,
                         Downloads = 0
                     };
-                    Startup.fileUploadModels.Add(fileUploadModel);
 
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    if (!Startup.fileUploadModels.Any(f => f.FileName == fileUploadModel.FileName))
                     {
-                        formFile.CopyTo(stream);
+                        Startup.fileUploadModels.Add(fileUploadModel);
+
+                        using (var ctx = new FileUploadContext())
+                        {
+                            ctx.Files.Add(fileUploadModel);
+                            ctx.SaveChanges();
+                        }
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            formFile.CopyTo(stream);
+                        }
                     }
                 }
             }
