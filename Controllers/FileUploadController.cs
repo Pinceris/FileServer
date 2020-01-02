@@ -67,7 +67,13 @@ namespace CoreApp1.Controllers
             }
 
             //update download counter
-            Startup.fileUploadModels.FirstOrDefault(q => q.FileName == filename).Downloads++;
+            using (var ctx = new FileUploadContext())
+            {
+                ctx.Files.FirstOrDefault(f => f.FileName == filename).Downloads++;
+
+                ctx.SaveChanges();
+            }
+            Startup.fileUploadModels.FirstOrDefault(f => f.FileName == filename).Downloads++;
 
             memory.Position = 0;
             return File(memory, MimeTypesMap.GetMimeType(filename), Path.GetFileName(path));

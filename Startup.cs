@@ -82,20 +82,39 @@ namespace CoreApp1
         {
             List<FileUploadModel> files = new List<FileUploadModel>();
 
+            List<FileUploadModel> fileUploads;
+
+            using (var ctx = new FileUploadContext())
+            {
+                fileUploads = ctx.Files.AsEnumerable<FileUploadModel>().ToList();
+            }
+
             string[] filesInDir = Directory.GetFiles("FileStorage");
 
             if (filesInDir.Length > 0)
             {
                 foreach (string file in filesInDir)
                 {
-                    FileUploadModel fileUpload = new FileUploadModel()
+                    FileUploadModel fileUpload;
+
+                    string fileName = file.Split('\\')[1];
+
+                    if(fileUploads.Any(f => f.FileName == fileName))
                     {
-                        Id = Guid.NewGuid(),
-                        Author = "System",
-                        FileName = file.Split('\\')[1],
-                        Created_At = DateTime.Now,
-                        Downloads = 0
-                    };
+                        fileUpload = fileUploads.Where(f => f.FileName == fileName).FirstOrDefault();
+                    }
+                    else
+                    {
+                        fileUpload = new FileUploadModel()
+                        {
+                            Id = Guid.NewGuid(),
+                            Author = "System",
+                            FileName = fileName,
+                            Created_At = DateTime.Now,
+                            Downloads = 0
+                        };
+                    }
+
                     files.Add(fileUpload);
                 }
             }

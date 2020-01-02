@@ -25,6 +25,14 @@ namespace CoreApp1
 
                 File.Delete(path);
                 Startup.fileUploadModels.RemoveAll(f => f.FileName == filename);
+
+                using (var ctx = new FileUploadContext())
+                {
+                    FileUploadModel file = ctx.Files.Where(f => f.FileName == filename).FirstOrDefault();
+
+                    ctx.Files.Remove(file);
+                    ctx.SaveChanges();
+                }
             }      
         }
         public void UploadFiles(List<IFormFile> files, string name)
@@ -49,7 +57,10 @@ namespace CoreApp1
 
                     if (!Startup.fileUploadModels.Any(f => f.FileName == fileUploadModel.FileName))
                     {
-                        Startup.fileUploadModels.Add(fileUploadModel);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            formFile.CopyTo(stream);
+                        }
 
                         using (var ctx = new FileUploadContext())
                         {
@@ -57,10 +68,7 @@ namespace CoreApp1
                             ctx.SaveChanges();
                         }
 
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            formFile.CopyTo(stream);
-                        }
+                        Startup.fileUploadModels.Add(fileUploadModel);
                     }
                 }
             }
